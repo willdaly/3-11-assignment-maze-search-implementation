@@ -1,0 +1,22 @@
+{
+  "schema_version": "0.1-draft",
+  "agent_id": "3-11-assignment-maze-search-implementation",
+  "name": "3.11 Assignment: Maze Search Implementation",
+  "summary": "Module 3&nbsp;3.11 Assignment: Maze Search Implementation\n\n\nOverview\nThis assignment is a chance for you to practice using the algorithms described in this module. You will be given the description of",
+  "domain": "general",
+  "capabilities": [
+    "fetch_canvas_assignment",
+    "create_github_repository",
+    "generate_starter_files"
+  ],
+  "interoperability": {
+    "a2a": "@agent-id",
+    "mcp": "#registry:server-name"
+  },
+  "registry": {
+    "url": "",
+    "status": "not_registered"
+  },
+  "source_repository": "https://github.com/willdaly/3-11-assignment-maze-search-implementation",
+  "metadata": {}
+}
