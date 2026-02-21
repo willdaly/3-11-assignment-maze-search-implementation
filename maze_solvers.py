@@ -58,62 +58,98 @@ def format_maze_output(maze, width=None, height=None):
     return "\n".join(output_lines).rstrip()
 
 
+def mark_solution_path(maze, parent, goal_state):
+    """Reconstruct and mark the path from start to goal using parent links."""
+    if goal_state not in parent:
+        return maze
+
+    path = []
+    current_state = goal_state
+    while current_state is not None:
+        path.append(current_state)
+        current_state = parent[current_state]
+    path.reverse()
+
+    for row_index, col_index in path:
+        if maze[row_index][col_index] in ("S", "E"):
+            continue
+        maze[row_index][col_index] = PATH_CHAR
+
+    return maze
+
+
+def initialize_search_context(maze, use_queue):
+    """Initialize common search variables for BFS/DFS."""
+    initial_state = find_state(maze, "S")
+    goal_state = find_state(maze, "E")
+
+    if initial_state is None or goal_state is None:
+        raise ValueError("Maze must include both 'S' and 'E'.")
+    
+    # Push the root node onto the stack.
+    frontier = deque([initial_state]) if use_queue else [initial_state] #frontier is the stack in this code, but it is implemented as a deque for BFS and a list for DFS
+    visited = {initial_state}
+    parent = {initial_state: None}
+    return goal_state, frontier, visited, parent
+
+
 #blind search algorithm:
 #breadth-first search (BFS) implementation
 def maze_solver_one(maze):
-    # set the initial state to the position of "S" in the maze
-    initial_state = find_state(maze, "S")
-    # set the goal state to the position of "E" in the maze
-    goal_state = find_state(maze, "E")
-    # frontier is a queue that will hold the states to explore, starting with the initial state
-    frontier = deque([initial_state])   # queue for BFS
-
-    visited = {initial_state}  # set to keep track of visited states
-
-    parent = {initial_state: None}  # dictionary to keep track of the parent of each state for path reconstruction
+    goal_state, frontier, visited, parent = initialize_search_context(maze, use_queue=True)
 
     # BFS loop runs until there are no more states to explore in the frontier
     while frontier: 
+        # Nodes are dequeued when it’s their turn to be explored.
         state = frontier.popleft() # get the next state to explore from the frontier (FIFO order for BFS)
 
         if state == goal_state: # if we have reached the goal state, we can stop searching
             break
 
         for action in ACTIONS: # iterate over all possible actions (U, D, L, R)
-            next_state = transition(state, action, maze) # compute the next state resulting from taking the action from the current state
+            # compute the next state resulting from taking the action from the current state
+            next_state = transition(state, action, maze) # alsso called child node
             if next_state is not None and next_state not in visited: # if the next state is valid (not a wall or out of bounds) and has not been visited yet
                 visited.add(next_state) # mark the next state as visited
                 parent[next_state] = state # record the current state as the parent of the next state for path reconstruction
+                # In BFS, nodes are enqueued when discovered, so we add the next state to the end of the frontier
                 frontier.append(next_state) # add the next state to the frontier to be explored in future iterations
 
-    # reconstruct path using parent dictionary
-    path = [] # list to hold the path from start to goal
-    current = goal_state # start from the goal state and follow the parent links back to the initial state
-    while current is not None: # while we haven't reached the initial state (which has parent None)
-        path.append(current) # add the current state to the path
-        current = parent[current] # move to the parent of the current state
-    path.reverse() # reverse the path to get it from start to goal order
-
-    # mark the path in the maze with PATH_CHAR
-    for row_index, col_index in path:
-        if maze[row_index][col_index] in ("S", "E"):
-            continue  # don't overwrite start or goal
-        maze[row_index][col_index] = PATH_CHAR
-
-    return maze
+    return mark_solution_path(maze, parent, goal_state)
 
 #heuristic search algorithm:
 def maze_solver_two(maze):
     """Solve the maze and return the solved maze output."""
     return maze
 
-#dealer's choice algorithm:
+#blind search algorithm:
+#Depth-first search (DFS) implementation
 def maze_solver_three(maze):
-    """Solve the maze and return the solved maze output."""
-    return maze
+    goal_state, frontier, visited, parent = initialize_search_context(maze, use_queue=False)
+    while frontier:
+        # pop the top node from the stack and explore it
+        state = frontier.pop()  # get the next state to explore from the frontier (LIFO order for DFS)
+        # If it’s the goal, stop.
+        if state == goal_state:
+            break
+
+        for action in ACTIONS:
+            next_state = transition(state, action, maze)
+            # Otherwise, push its children onto the stack.
+            if next_state is not None and next_state not in visited:
+                visited.add(next_state)
+                parent[next_state] = state
+                frontier.append(next_state)
+    return mark_solution_path(maze, parent, goal_state)
 
 def main():
     solved_maze = maze_solver_one([row[:] for row in maze])
+    print(format_maze_output(solved_maze, width=width, height=height))
+
+    #solved_maze = maze_solver_two([row[:] for row in maze])
+    #print(format_maze_output(solved_maze, width=width, height=height))
+
+    solved_maze = maze_solver_three([row[:] for row in maze])
     print(format_maze_output(solved_maze, width=width, height=height))
 
 
