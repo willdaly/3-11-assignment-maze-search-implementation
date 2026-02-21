@@ -2,6 +2,7 @@
 
 from pathlib import Path
 from collections import deque
+import heapq
 
 #load maze from file
 maze_text = Path(__file__).with_name("maze.txt").read_text(encoding="utf-8")
@@ -126,10 +127,27 @@ def maze_solver_one(maze):
 
     return mark_solution_path(maze, parent, goal_state)
 
-#heuristic search algorithm:
+#heuristic search algorithm: Greedy Best-First Search implementation with Manhattan distance heuristic
 def maze_solver_two(maze):
-    """Solve the maze and return the solved maze output."""
-    return maze
+    initial_state = find_state(maze, "S")
+    goal_state = find_state(maze, "E")
+    if initial_state is None or goal_state is None:
+        raise ValueError("Maze must include both 'S' and 'E'.")
+    frontier = []
+    heapq.heappush(frontier, (manhattan_distance(initial_state, goal_state), initial_state))  # (priority, state)
+    visited = {initial_state}
+    parent = {initial_state: None}  
+    while frontier:
+        priority, state = heapq.heappop(frontier)
+        if state == goal_state:
+            break
+        for action in ACTIONS:
+            next_state = transition(state, action, maze)
+            if next_state is not None and next_state not in visited:
+                visited.add(next_state)
+                parent[next_state] = state
+                heapq.heappush(frontier, (manhattan_distance(next_state, goal_state), next_state))
+    return mark_solution_path(maze, parent, goal_state)
 
 #blind search algorithm:
 #Depth-first search (DFS) implementation
@@ -155,8 +173,8 @@ def main():
     solved_maze = maze_solver_one([row[:] for row in maze])
     print(format_maze_output(solved_maze, width=width, height=height))
 
-    #solved_maze = maze_solver_two([row[:] for row in maze])
-    #print(format_maze_output(solved_maze, width=width, height=height))
+    solved_maze = maze_solver_two([row[:] for row in maze])
+    print(format_maze_output(solved_maze, width=width, height=height))
 
     solved_maze = maze_solver_three([row[:] for row in maze])
     print(format_maze_output(solved_maze, width=width, height=height))
