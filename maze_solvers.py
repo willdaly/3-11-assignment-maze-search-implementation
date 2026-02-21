@@ -80,6 +80,7 @@ def mark_solution_path(maze, parent, goal_state):
 
 def initialize_search_context(maze, use_queue):
     """Initialize common search variables for BFS/DFS."""
+    # initial state is the root node of the search tree
     initial_state = find_state(maze, "S")
     goal_state = find_state(maze, "E")
 
@@ -93,6 +94,11 @@ def initialize_search_context(maze, use_queue):
     return goal_state, frontier, visited, parent
 
 
+def manhattan_distance(current_state, goal_state):
+    """Return Manhattan distance between two maze coordinates."""
+    return abs(current_state[0] - goal_state[0]) + abs(current_state[1] - goal_state[1])
+
+
 #blind search algorithm:
 #breadth-first search (BFS) implementation
 def maze_solver_one(maze):
@@ -100,9 +106,11 @@ def maze_solver_one(maze):
 
     # BFS loop runs until there are no more states to explore in the frontier
     while frontier: 
+        # Deque the front node
         # Nodes are dequeued when it’s their turn to be explored.
         state = frontier.popleft() # get the next state to explore from the frontier (FIFO order for BFS)
 
+        # Check if it’s the goal. If yes, stop.
         if state == goal_state: # if we have reached the goal state, we can stop searching
             break
 
@@ -112,6 +120,7 @@ def maze_solver_one(maze):
             if next_state is not None and next_state not in visited: # if the next state is valid (not a wall or out of bounds) and has not been visited yet
                 visited.add(next_state) # mark the next state as visited
                 parent[next_state] = state # record the current state as the parent of the next state for path reconstruction
+                # If not, enqueue all its children.
                 # In BFS, nodes are enqueued when discovered, so we add the next state to the end of the frontier
                 frontier.append(next_state) # add the next state to the frontier to be explored in future iterations
 
