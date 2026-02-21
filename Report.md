@@ -2,7 +2,7 @@
 
 Student Name: Will Daly  
 Course: Northeastern AAI6600 Applied AI
-Date: 2-21-226
+Date: 2-21-2026
 
 ## Introduction to Search Algorithms
 

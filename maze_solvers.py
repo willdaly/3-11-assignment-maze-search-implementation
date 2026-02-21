@@ -3,6 +3,7 @@
 from pathlib import Path
 from collections import deque
 import heapq
+from typing import Optional
 
 #load maze from file
 maze_text = Path(__file__).with_name("maze.txt").read_text(encoding="utf-8")
@@ -16,6 +17,7 @@ maze_lines = lines[1:]                       # actual maze rows
 maze = [list(row) for row in maze_lines]
 
 PATH_CHAR = "*"
+State = tuple[int, int]
 
 ACTIONS = {
     "U": (-1, 0),
@@ -24,7 +26,7 @@ ACTIONS = {
     "R": (0, 1),
 }
 
-def find_state(maze, target):
+def find_state(maze, target) -> Optional[State]:
     for r, row in enumerate(maze):
         for c, ch in enumerate(row):
             if ch == target:
@@ -79,7 +81,7 @@ def mark_solution_path(maze, parent, goal_state):
     return maze
 
 
-def initialize_search_context(maze, use_queue):
+def initialize_search_context(maze):
     """Initialize common search variables for BFS/DFS."""
     # initial state is the root node of the search tree
     initial_state = find_state(maze, "S")
@@ -87,12 +89,10 @@ def initialize_search_context(maze, use_queue):
 
     if initial_state is None or goal_state is None:
         raise ValueError("Maze must include both 'S' and 'E'.")
-    
-    # Push the root node onto the stack.
-    frontier = deque([initial_state]) if use_queue else [initial_state] #frontier is the stack in this code, but it is implemented as a deque for BFS and a list for DFS
-    visited = {initial_state}
-    parent = {initial_state: None}
-    return goal_state, frontier, visited, parent
+
+    visited: set[State] = {initial_state}
+    parent: dict[State, Optional[State]] = {initial_state: None}
+    return initial_state, goal_state, visited, parent
 
 
 def manhattan_distance(current_state, goal_state):
@@ -103,7 +103,8 @@ def manhattan_distance(current_state, goal_state):
 #blind search algorithm:
 #breadth-first search (BFS) implementation
 def maze_solver_one(maze):
-    goal_state, frontier, visited, parent = initialize_search_context(maze, use_queue=True)
+    initial_state, goal_state, visited, parent = initialize_search_context(maze)
+    frontier = deque([initial_state])
 
     # BFS loop runs until there are no more states to explore in the frontier
     while frontier: 
@@ -152,7 +153,8 @@ def maze_solver_two(maze):
 #blind search algorithm:
 #Depth-first search (DFS) implementation
 def maze_solver_three(maze):
-    goal_state, frontier, visited, parent = initialize_search_context(maze, use_queue=False)
+    initial_state, goal_state, visited, parent = initialize_search_context(maze)
+    frontier = [initial_state]
     while frontier:
         # pop the top node from the stack and explore it
         state = frontier.pop()  # get the next state to explore from the frontier (LIFO order for DFS)

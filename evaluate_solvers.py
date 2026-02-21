@@ -21,7 +21,7 @@ from __future__ import annotations
 
 from time import perf_counter
 import tracemalloc
-from typing import Callable, Dict, List, Tuple
+from typing import Callable, List, Tuple
 
 import maze_solvers as ms
 
@@ -63,7 +63,7 @@ def compute_graph_size(maze: MazeGrid) -> Tuple[int, int]:
     return node_count, edge_count
 
 
-def evaluate_solver(solver_name: str, solver: Callable[[MazeGrid], MazeGrid], base_maze: MazeGrid) -> Dict[str, float]:
+def evaluate_solver(solver_name: str, solver: Callable[[MazeGrid], MazeGrid], base_maze: MazeGrid) -> dict[str, float | str]:
     """Run one solver and collect evaluation metrics."""
     transition_calls = 0
     original_transition = ms.transition
@@ -132,7 +132,7 @@ def main() -> None:
 
     for result in results:
         print(
-            result["solver"].ljust(34),
+            str(result["solver"]).ljust(34),
             f"{result['runtime_ms']:.3f}".rjust(12),
             f"{result['peak_memory_kib']:.2f}".rjust(10),
             f"{int(result['transition_calls'])}".rjust(12),

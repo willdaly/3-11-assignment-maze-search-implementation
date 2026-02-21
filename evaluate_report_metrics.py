@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from time import perf_counter
 import tracemalloc
-from typing import Callable, Dict, List, Tuple
+from typing import Callable, List, Tuple
 
 import maze_solvers as ms
 
@@ -37,7 +37,7 @@ def evaluate_solver(
     solver: Callable[[MazeGrid], MazeGrid],
     base_maze: MazeGrid,
     runs: int = 20,
-) -> Dict[str, float]:
+) -> dict[str, float | str]:
     """Run a solver repeatedly and collect empirical metrics."""
     total_time_ms = 0.0
     peak_memory_kib = 0.0
