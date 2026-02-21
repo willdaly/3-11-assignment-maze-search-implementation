@@ -68,6 +68,17 @@ I ran all three solvers on the required maze and compared path quality, runtime,
 - Shortest path: [Algorithm]
 - Most memory-efficient in this test: [Algorithm]
 
+### How to interpret the evaluation metrics
+
+The script `evaluate_report_metrics.py` reports four groups of metrics. I interpret them as follows:
+
+- **Time complexity (empirical)**: Use **Avg Time (ms)** to compare practical speed on the same maze. Lower is better.
+- **Space complexity (empirical)**: Use **Peak Memory (KiB)** to compare memory use during execution. Lower is better.
+- **Solution quality**: Use **Path Length** (number of `*` cells). For the same maze, a shorter path is better; matching BFS generally indicates optimality in this unweighted setting.
+- **Search space traversal**: Use **Transition Calls** and **Expanded States~** to estimate how much of the search space was explored before finding the goal. Fewer expansions usually indicate a more efficient search.
+
+For this report, these values provide empirical evidence, while Big-O expressions (for example, $O(V + E)$) describe asymptotic growth behavior.
+
 ## Optimality, Time, and Space Analysis
 
 ### BFS
