@@ -5,17 +5,6 @@ from collections import deque
 import heapq
 from typing import Optional
 
-#load maze from file
-maze_text = Path(__file__).with_name("maze.txt").read_text(encoding="utf-8")
-
-#convert maze text to 2D list
-lines = [ln.rstrip("\n") for ln in maze_text.splitlines() if ln.strip()]
-width, height = map(int, lines[0].split())   # "10 6"
-maze_lines = lines[1:]                       # actual maze rows
-
-#create 2D list representation of the maze
-maze = [list(row) for row in maze_lines]
-
 PATH_CHAR = "*"
 State = tuple[int, int]
 
@@ -25,6 +14,30 @@ ACTIONS = {
     "L": (0, -1),
     "R": (0, 1),
 }
+
+
+def parse_maze_text(maze_text: str) -> tuple[int, int, list[list[str]]]:
+    """Parse assignment-format maze text into width, height, and a grid."""
+    lines = [line.rstrip("\n") for line in maze_text.splitlines() if line.strip()]
+    if not lines:
+        raise ValueError("Maze text is empty.")
+
+    width, height = map(int, lines[0].split())
+    maze_lines = lines[1:]
+
+    if len(maze_lines) != height:
+        raise ValueError(f"Maze height mismatch: expected {height} rows, found {len(maze_lines)}.")
+
+    if any(len(row) != width for row in maze_lines):
+        raise ValueError("Maze width mismatch: one or more rows do not match the declared width.")
+
+    return width, height, [list(row) for row in maze_lines]
+
+
+def load_maze_from_file(file_path: str | Path) -> tuple[int, int, list[list[str]]]:
+    """Load a maze from a text file in the assignment format."""
+    maze_text = Path(file_path).read_text(encoding="utf-8")
+    return parse_maze_text(maze_text)
 
 def find_state(maze, target) -> Optional[State]:
     for r, row in enumerate(maze):
@@ -172,6 +185,8 @@ def maze_solver_three(maze):
     return mark_solution_path(maze, parent, goal_state)
 
 def main():
+    width, height, maze = load_maze_from_file(Path(__file__).with_name("maze.txt"))
+
     solved_maze = maze_solver_one([row[:] for row in maze])
     print(format_maze_output(solved_maze, width=width, height=height))
 

@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from time import perf_counter
 import tracemalloc
+from pathlib import Path
 from typing import Callable, List, Tuple
 
 import maze_solvers as ms
@@ -92,7 +93,8 @@ def print_table_row(values: List[str], widths: List[int]) -> None:
 
 
 def main() -> None:
-    base_maze = clone_maze(ms.maze)
+    _width, _height, loaded_maze = ms.load_maze_from_file(Path(__file__).with_name("maze.txt"))
+    base_maze = clone_maze(loaded_maze)
     node_count = count_non_wall_nodes(base_maze)
 
     solvers = [

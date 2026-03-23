@@ -21,6 +21,7 @@ from __future__ import annotations
 
 from time import perf_counter
 import tracemalloc
+from pathlib import Path
 from typing import Callable, List, Tuple
 
 import maze_solvers as ms
@@ -102,7 +103,8 @@ def evaluate_solver(solver_name: str, solver: Callable[[MazeGrid], MazeGrid], ba
 
 
 def main() -> None:
-    base_maze = clone_maze(ms.maze)
+    _width, _height, loaded_maze = ms.load_maze_from_file(Path(__file__).with_name("maze.txt"))
+    base_maze = clone_maze(loaded_maze)
     node_count, edge_count = compute_graph_size(base_maze)
 
     print("=== Maze Graph Size ===")
